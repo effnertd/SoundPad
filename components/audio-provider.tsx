@@ -554,7 +554,10 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     audio.playbackRate = data.speed
     audio.volume = Math.min(data.volume || 1, 1)
     audio.loop = data.loop || false
-    if (outputDeviceId && 'setSinkId' in HTMLAudioElement.prototype) {
+    // Only call setSinkId on the element for non-Web-Audio pads.
+    // For Web Audio pads, AudioContext.setSinkId() handles routing —
+    // calling setSinkId on a Web-Audio-connected element throws AbortError.
+    if (!needsWebAudio && outputDeviceId && 'setSinkId' in HTMLAudioElement.prototype) {
       try { await (audio as any).setSinkId(outputDeviceId) } catch (err) {
         console.error('audio.setSinkId failed:', err)
       }
