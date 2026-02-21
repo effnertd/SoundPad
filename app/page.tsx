@@ -12,7 +12,12 @@ import { cn } from "@/lib/utils"
 function OutputDeviceSelector() {
   const { availableOutputDevices, outputDeviceId, setOutputDeviceId } = useAudio()
 
-  if (availableOutputDevices.length <= 1) return null
+  if (availableOutputDevices.length === 0) return null
+
+  // Filter out the "default" and "communications" pseudo-devices to avoid duplicating the Default option
+  const namedDevices = availableOutputDevices.filter(
+    d => d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label
+  )
 
   return (
     <div className="flex items-center gap-1.5">
@@ -23,9 +28,9 @@ function OutputDeviceSelector() {
         className="text-xs bg-transparent border border-border rounded px-1.5 py-1 text-foreground max-w-[140px] truncate cursor-pointer"
       >
         <option value="">Default</option>
-        {availableOutputDevices.map(d => (
+        {namedDevices.map(d => (
           <option key={d.deviceId} value={d.deviceId}>
-            {d.label || `Output ${d.deviceId.slice(0, 6)}`}
+            {d.label}
           </option>
         ))}
       </select>
